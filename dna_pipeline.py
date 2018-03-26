@@ -19,7 +19,7 @@ wd = ""
 
 
 def system_command_send(command, from_function, th):
-    from datetime import datetime
+    
     logs = {'function': "", 'command': "", 'start_time': "", 'end_time': "", 'threads': "", 'success': 0}
     logs["function"] = from_function
     logs["command"] = command
@@ -30,12 +30,12 @@ def system_command_send(command, from_function, th):
         os.system(command)
         logs["end_time"] = str(datetime.now())
         logs["success"] = 1
-        write_logs()
+        write_logs(logs)
 
     except:
         logs["end_time"] = str(datetime.now())
         logs["success"] = 0
-        write_logs()
+        write_logs(logs)
         return from_function + " give error with this command -> " + command
 
 
