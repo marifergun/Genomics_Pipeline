@@ -39,10 +39,10 @@ def system_command_send(command, from_function, th):
         return from_function + " give error with this command -> " + command
 
 
-def write_logs(self):
+def write_logs(log):
     import json
     with open('log_file.txt', 'a') as file:
-        file.write(json.dumps(self.logs))
+        file.write(json.dumps(log))
         file.write(",")
 
 
@@ -51,11 +51,12 @@ class BamPipeline(object):
     def __init__(self, working_directory, map_type, sample_type, library_matching_id, thrds):
         self.working_directory = working_directory
         wd = working_directory
+        log_s = {'function': "", 'command': "", 'start_time': "", 'end_time': "", 'threads': "", 'success': 0}
         self.map_type = map_type
         self.sample_type = sample_type
         self.library_matching_id = library_matching_id
         self.threads = thrds
-        write_logs()
+        write_logs(log_s)
         self.bundle_dir = ref_dir + "hg19_bundle"
 
     def get_fastq(self):
