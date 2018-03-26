@@ -235,8 +235,10 @@ class BamPipeline(object):
     def run_pipeline(self):
 
         fastqs = self.get_fastq()
+        print(fastqs)
         info = self.get_info(fastqs)
-        self.mapping(info, fastqs)
+        print(info)
+        self.mapping(fastqs, info)
         self.merge_bams(info)
         self.mark_duplicate()
         self.run_gatks()
