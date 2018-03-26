@@ -241,6 +241,8 @@ class BamPipeline(object):
         self.run_gatks()
         self.create_folder()
 
+        return True
+
     def create_folder(self):
 
         mk_dir = self.working_directory + "/" + self.map_type
@@ -254,7 +256,7 @@ class BamPipeline(object):
 
 class VariantCall(object):
 
-    def __init__(self, variant_caller, thrds, map_type,  tumor_bam, tumor_realign):
+    def __init__(self, variant_caller, thrds, map_type, germline_bam, germline_realign):
 
         self.working_directory = wd + "/" + map_type
         os.chdir(self.working_directory)
@@ -265,28 +267,29 @@ class VariantCall(object):
         normal_bam = glob.glob("Completeted_BaseCalibrator_*.bam")
         normal_realign = glob.glob("realign_target.intervals")
         self.normal_bam = normal_bam[0]
-        self.tumor_bam = tumor_bam
+        self.germline_bam = germline_bam
         self.normal_realign = normal_realign[0]
-        self.tumor_realign = tumor_realign
-        self.realign_target = self.normal_realign + " " + self.tumor_realign
+        self.germline_realign = germline_realign
+        self.realign_target = self.normal_realign + " " + self.germline_realign
         self.output_vcf = variant_caller + "_ouput.vcf"
 
-    def caller_function(self):
+    def run_pipeline(self):
         if self.v_caller == "Mutect2":
             self.mutect_caller()
         elif self.v_caller == "Varscan":
             self.varscan_caller()
+        return True
 
     def mutect_caller(self):
         nct = " -nct " + self.threads
         command = "java -jar " + gatk_path + " -T MuTect2 " + nct + " -R " + self.ref_dir + " -I:tumor " + \
-                  self.tumor_bam + " -I:normal " + self.normal_bam + " --dbsnp " + dbsnp + " --cosmic " + \
-                  cosmic + " -L " + self.normal_realign + " -L " + self.tumor_realign + " -o " + self.output_vcf
+                  self.germline_bam + " -I:normal " + self.normal_bam + " --dbsnp " + dbsnp + " --cosmic " + \
+                  cosmic + " -L " + self.normal_realign + " -L " + self.germline_realign + " -o " + self.output_vcf
         system_command_send(command, "mutect_caller", self.threads)
 
     def varscan_caller_step1(self):
         command = "samtools mpileup -f " + self.ref_dir + " -q 1 -B " + self.normal_bam + " " + \
-                  self.tumor_bam + " > intermediate_mpileup.pileup"
+                  self.germline_bam + " > intermediate_mpileup.pileup"
 
         system_command_send(command, "varscan_caller_step1", self.threads)
         intermediate_mpileup = glob.glob("intermediate_mpileup.pileup")
