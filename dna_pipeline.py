@@ -50,7 +50,8 @@ class BamPipeline(object):
     # workingdirectory,  map_type, sample_type, library_matching_id, thrds
     def __init__(self, working_directory, map_type, sample_type, library_matching_id, thrds):
         self.working_directory = working_directory
-        wd = working_directory
+        global wd 
+        wd = self.working_directory
         log_s = {'function': "", 'command': "", 'start_time': "", 'end_time': "", 'threads': "", 'success': 0}
         self.map_type = map_type
         self.sample_type = sample_type
@@ -234,15 +235,15 @@ class BamPipeline(object):
 
     def run_pipeline(self):
 
-        fastqs = self.get_fastq()
-        print(fastqs)
-        info = self.get_info(fastqs)
-        print(info)
-        self.mapping(fastqs, info)
-        self.merge_bams(info)
-        self.mark_duplicate()
-        self.run_gatks()
-        self.create_folder()
+        # fastqs = self.get_fastq()
+        # print(fastqs)
+        # info = self.get_info(fastqs)
+        # print(info)
+        # self.mapping(fastqs, info)
+        # self.merge_bams(info)
+        # self.mark_duplicate()
+        # self.run_gatks()
+        # self.create_folder()
 
         return True
 
@@ -261,19 +262,23 @@ class VariantCall(object):
 
     def __init__(self, variant_caller, thrds, map_type, germline_bam, germline_realign):
 
+        global wd
         self.working_directory = wd + "/" + map_type
         os.chdir(self.working_directory)
+        print("adsadsad")
+        print(self.working_directory)
+        print("dsafasdsa")
         self.v_caller = variant_caller
         self.threads = thrds
         self.map_type = map_type
         self.ref_dir = ref_dir + "/hg19_bundle/ucsc.hg19.fasta"
-        normal_bam = glob.glob("Completeted_BaseCalibrator_*.bam")
-        normal_realign = glob.glob("realign_target.intervals")
-        self.normal_bam = normal_bam[0]
+        tumor_bam = glob.glob("Completeted_BaseCalibrator_*.bam")
+        tumor_realign = glob.glob("realign_target.intervals")
+        self.tumor_bam = self.working_directory + "/" + tumor_bam[0]
         self.germline_bam = germline_bam
-        self.normal_realign = normal_realign[0]
+        self.tumor_realign = self.working_directory + "/" + tumor_realign[0]
         self.germline_realign = germline_realign
-        self.realign_target = self.normal_realign + " " + self.germline_realign
+        self.realign_target = self.tumor_realign + " " + self.germline_realign
         self.output_vcf = variant_caller + "_ouput.vcf"
 
     def run_pipeline(self):
@@ -286,12 +291,13 @@ class VariantCall(object):
     def mutect_caller(self):
         nct = " -nct " + self.threads
         command = "java -jar " + gatk_path + " -T MuTect2 " + nct + " -R " + self.ref_dir + " -I:tumor " + \
-                  self.germline_bam + " -I:normal " + self.normal_bam + " --dbsnp " + dbsnp + " --cosmic " + \
-                  cosmic + " -L " + self.normal_realign + " -L " + self.germline_realign + " -o " + self.output_vcf
+                  self.tumor_bam + " -I:normal " + self.germline_bam + " --dbsnp " + dbsnp + " --cosmic " + \
+                  cosmic + " -L " + self.tumor_realign + " -L " + self.germline_realign + " -o " + self.output_vcf
+        print(command)
         system_command_send(command, "mutect_caller", self.threads)
 
     def varscan_caller_step1(self):
-        command = "samtools mpileup -f " + self.ref_dir + " -q 1 -B " + self.normal_bam + " " + \
+        command = "samtools mpileup -f " + self.ref_dir + " -q 1 -B " + self.tumor_bam + " " + \
                   self.germline_bam + " > intermediate_mpileup.pileup"
 
         system_command_send(command, "varscan_caller_step1", self.threads)

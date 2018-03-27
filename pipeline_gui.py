@@ -87,7 +87,9 @@ class PipelineGui:
             gm_bam = glob("Completeted_BaseCalibrator_*.bam")
             gm_interval = glob("realign_target.intervals")
             chdir(wd+"/"+mt)
-            pipeline2 = dna.VariantCall(variant_caller=vc, thrds=th, map_type=mt, germline_bam=gm_bam[0], germline_realign=gm_interval[0])
+            bam = gm + "/" + mt + "/" + gm_bam[0]
+            interval = gm + "/" + mt + "/" + gm_interval[0]
+            pipeline2 = dna.VariantCall(variant_caller=vc, thrds=th, map_type=mt, germline_bam=bam, germline_realign=interval)
             pipeline2_success = pipeline2.run_pipeline()
 
             return pipeline2_success
