@@ -357,4 +357,14 @@ class ReadLogs(object):
         c = b - a
         d = c.total_seconds()
         k = divmod(d, 3600)[0]
-        return df, k
+        df_grouped = self.group_df(df)
+        return df_grouped, k
+    
+    def group_df(self, df):
+        df1 = df[["function", "start_time", "end_time"]].copy()
+        df1['diff'] = df.apply(lambda row:lg.convert_date(row["end_time"]) - lg.convert_date(row["start_time"]),axis=1)
+        df1.drop(df1[df1["diff"] == "00:00:00"].index, inplace=True)
+        a = len(df1['function'])
+        df1['m'] = range(0,a,1)
+        a = df1.groupby("function")[["start_time","end_time","diff","m"]].agg({"m":"min",'start_time': 'min', 'end_time': "max", "diff":"sum"}).sort_values("m")
+        return a
