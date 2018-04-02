@@ -48,25 +48,7 @@ class PipelineGui:
             .grid(column=0, row=6, columnspan=2)
         self.threads = tk.Entry(self.parent)
         self.threads.grid(column=2, row=6, columnspan=4)
-
-        self.label1_2 = tk.Label(self.parent, text="2. Pipeline", fg="black", font=("Times", 30, "bold")) \
-            .grid(column=1, row=7, sticky="SE", padx=10)
-
-        self.var_variantcaller = tk.StringVar()
-        self.label7 = tk.Label(self.parent, text="Variant Caller: ", fg="black", font=("Times", 15)) \
-            .grid(column=0, row=8, columnspan=2)
-        self.variantcaller1 = tk.Radiobutton(self.parent, text="Mutect2", variable=self.var_variantcaller, value="Mutect2") \
-            .grid(column=2, row=8)
-        self.variantcaller2 = tk.Radiobutton(self.parent, text="Varscan", variable=self.var_variantcaller, value="Varscan") \
-            .grid(column=3, row=8)
-
-        self.label8 = tk.Label(self.parent, text="Germline Folder: ", fg="black", font=("Times", 15)) \
-            .grid(column=0, row=9, columnspan=2)
-        self.germline = tk.Entry(self.parent)
-        self.germline.grid(column=2, row=9, columnspan=4)
-
-        self.submit_button = tk.Button(self.parent, text="Submit", command=self.OnClick, width=20).grid(row=10, column=2)
-
+        self.submit_button = tk.Button(self.parent, text="Next =>", command=self.onSample, width=20).grid(row=7, column=2)
         self.parent.mainloop()
 
     def OnClick(self):
@@ -76,13 +58,22 @@ class PipelineGui:
         wd = self.working_directory.get()
         lb = self.library.get()
         th = self.threads.get()
-        vc = self.var_variantcaller.get()
-        gm = self.germline.get()
+        vc = ""
+        gm = ""
+        sample_type_check = False
 
-        pipeline1 = dna.BamPipeline(working_directory=wd, map_type=mt, sample_type=st, library_matching_id= lb, thrds=th)
-        pipeline1_success = pipeline1.run_pipeline()
+        if st == "Germline":
+            sample_type_check = False
+            
+        else:
+            sample_type_check = True
+            vc = self.var_variantcaller.get()
+            gm = self.germline.get()
 
-        if True:
+        print(sample_type_check)
+        if sample_type_check:
+            pipeline1 = dna.BamPipeline(working_directory=wd, map_type=mt, sample_type=st, library_matching_id= lb, thrds=th)
+            pipeline1_success = pipeline1.run_pipeline()
             chdir(gm + "/" + mt)
             gm_bam = glob("Completeted_BaseCalibrator_*.bam")
             gm_interval = glob("realign_target.intervals")
@@ -91,9 +82,39 @@ class PipelineGui:
             interval = gm + "/" + mt + "/" + gm_interval[0]
             pipeline2 = dna.VariantCall(variant_caller=vc, thrds=th, map_type=mt, germline_bam=bam, germline_realign=interval)
             pipeline2_success = pipeline2.run_pipeline()
-
             return pipeline2_success
         else:
-            return False
+            print("------------")
+            pipeline1 = dna.BamPipeline(working_directory=wd, map_type=mt, sample_type=st, library_matching_id= lb, thrds=th)
+            pipeline1_success = pipeline1.run_pipeline()
+            return pipeline1_success
+
+    def onSample(self):
+
+        st = self.var_sampletype.get()
+        if st == "Tumor":
+            for label in self.parent.grid_slaves():
+                if int(label.grid_info()["row"]) == 7:
+                    label.grid_forget()
+            self.label1_2 = tk.Label(self.parent, text="2. Pipeline", fg="black", font=("Times", 30, "bold")) \
+                .grid(column=1, row=7, sticky="SE", padx=10)
+
+            self.var_variantcaller = tk.StringVar()
+            self.label7 = tk.Label(self.parent, text="Variant Caller: ", fg="black", font=("Times", 15)) \
+                .grid(column=0, row=8, columnspan=2)
+            self.variantcaller1 = tk.Radiobutton(self.parent, text="Mutect2", variable=self.var_variantcaller, value="Mutect2") \
+                .grid(column=2, row=8)
+            self.variantcaller2 = tk.Radiobutton(self.parent, text="Varscan", variable=self.var_variantcaller, value="Varscan") \
+                .grid(column=3, row=8)
+
+            self.label8 = tk.Label(self.parent, text="Germline Folder: ", fg="black", font=("Times", 15)) \
+                .grid(column=0, row=9, columnspan=2)
+            self.germline = tk.Entry(self.parent)
+            self.germline.grid(column=2, row=9, columnspan=4)
+
+            self.submit_button_final = tk.Button(self.parent, text="Submit", command=self.OnClick, width=20).grid(row=10, column=2)
+        else:
+            self.OnClick()
+
 
 PipelineGui()
