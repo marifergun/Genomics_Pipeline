@@ -303,7 +303,7 @@ class VariantCall(object):
         system_command_send(command, "varscan_caller_step1", self.threads)
         intermediate_mpileup = glob.glob("intermediate_mpileup.pileup")
         print(command)
-        return intermediate_mpileup
+        return intermediate_mpileup[0]
 
     def varscan_caller_step2(self, intermediate_mpileup):
         cwd = os.getcwd()
@@ -316,7 +316,7 @@ class VariantCall(object):
         system_command_send(command, "varscan_caller_step2", self.threads)
         intermediate_varscan_somatic = glob.glob("output.basename*")
         print(command)
-        return intermediate_varscan_somatic
+        return intermediate_varscan_somatic[0]
 
     def varscan_caller_step3(self, intermediate_varscan_somatic):
         print(intermediate_varscan_somatic)
