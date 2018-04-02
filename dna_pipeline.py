@@ -366,5 +366,7 @@ class ReadLogs(object):
         df1.drop(df1[df1["diff"] == "00:00:00"].index, inplace=True)
         a = len(df1['function'])
         df1['m'] = range(0,a,1)
-        a = df1.groupby("function")[["start_time","end_time","diff","m"]].agg({"m":"min",'start_time': 'min', 'end_time': "max", "diff":"sum"}).sort_values("m")
+        df1["diff_seconds"] = df1["diff"].apply(lambda row: row.total_seconds())
+        a = df1.groupby("function")[["start_time","end_time","diff","m","diff_seconds"]].agg({"m":"min",'start_time': 'min', 'end_time': "max", "diff":"sum","diff_seconds":"sum"}).sort_values("m")
+        a["diff_minutes"] = a["diff"].apply(lambda row: divmod(row.total_seconds(),60)[0])
         return a
