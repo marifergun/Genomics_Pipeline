@@ -361,15 +361,16 @@ class ReadLogs(object):
         return df_grouped, k
     
     def group_df(self, df):
-        df1 = df[["function", "start_time", "end_time"]].copy()
-        df1['diff'] = df.apply(lambda row:lg.convert_date(row["end_time"]) - lg.convert_date(row["start_time"]),axis=1)
+        df1 = df[["function", "start_time", "end_time","threads"]].copy()
+        df1['diff'] = df.apply(lambda row:self.convert_date(row["end_time"]) - self.convert_date(row["start_time"]),axis=1)
         df1.drop(df1[df1["diff"] == "00:00:00"].index, inplace=True)
         a = len(df1['function'])
         df1['m'] = range(0,a,1)
         df1["diff_seconds"] = df1["diff"].apply(lambda row: row.total_seconds())
-        a = df1.groupby("function")[["start_time","end_time","diff","m","diff_seconds"]].agg({"m":"min",'start_time': 'min', 'end_time': "max", "diff":"sum","diff_seconds":"sum"}).sort_values("m")
+        a = df1.groupby("function")[["start_time","end_time","diff","m","diff_seconds","threads"]].agg({"threads":"min","m":"min",'start_time': 'min', 'end_time': "max", "diff":"sum","diff_seconds":"sum"}).sort_values("m")
         a["diff_minutes"] = a["diff"].apply(lambda row: divmod(row.total_seconds(),60)[0])
         return a
+    
     def give_bar_plot(self,df):
         import seaborn as sns
         import matplotlib.pyplot as plt
@@ -386,6 +387,6 @@ class ReadLogs(object):
         sns.barplot(x="diff_minutes", y="function", data=b,
                     label="Minutes of that function", color="b")
         ax.legend(ncol=2, loc="upper right", frameon=True)
-        ax.set(xlim=(0,401), ylabel="Function that run",xlabel="Cost of functions")
+        ax.set(xlim=(0,1200), ylabel="Function that run",xlabel="Cost of functions")
         sns.despine(left=True, bottom=True)
         return ax
