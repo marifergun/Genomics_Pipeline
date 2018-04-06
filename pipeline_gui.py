@@ -26,7 +26,7 @@ class PipelineGui:
 
         self.map_type1 = tk.Radiobutton(self.parent, text="Bwa", variable=self.var_maptype, value="Bwa") \
             .grid(column=2, row=3)
-        self.map_type2 = tk.Radiobutton(self.parent, text="Bowtie2", variable=self.var_maptype, value="Bowtie") \
+        self.map_type2 = tk.Radiobutton(self.parent, text="Bowtie2", variable=self.var_maptype, value="Bowtie2") \
             .grid(column=3, row=3)
 
         self.label4 = tk.Label(self.parent, text="Sample Type: ", fg="black", font=("Times", 15)) \
