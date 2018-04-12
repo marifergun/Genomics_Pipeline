@@ -21,9 +21,10 @@ class VariantCall(object):
         tumor_realign = glob.glob("realign_target.intervals")
         self.tumor_bam = self.working_directory + "/" + tumor_bam[0]
         self.germline_bam = germline_bam
-        self.tumor_realign = self.working_directory + "/" + tumor_realign[0]
-        self.germline_realign = germline_realign
-        self.realign_target = self.tumor_realign + " " + self.germline_realign
+        if variant_caller == "Mutect2":
+            self.tumor_realign = self.working_directory + "/" + tumor_realign[0]
+            self.germline_realign = germline_realign
+            self.realign_target = self.tumor_realign + " " + self.germline_realign
         self.output_vcf = variant_caller + "_ouput.vcf"
 
     def run_pipeline(self):

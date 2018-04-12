@@ -90,13 +90,14 @@ class BamPipeline(object):
                     map_bam = "bwa mem -t " + self.threads + " " + add_read_group + self.get_paths.ref_dir + \
                               "Bwa/ucsc.hg19.fasta " + read1[0] + " " + read2[0] + \
                               " | samtools view -@" + self.threads + " -bS - > " + gene_origin
-                elif self.map_type == "Bowtie":
+                    print(map_bam)
+                elif self.map_type == "Bowtie2":
 
                     add_read_group = " --rg-id " + RG_ID + " --rg SM:" + RG_SM + " --rg LB:" + RG_LB + " --rg PL:" + \
                                      RG_PL + " --rg PU:" + RG_PU
 
                     map_bam = "bowtie2 -p" + self.threads + add_read_group + " -x " + self.get_paths.ref_dir + \
-                              "Bowtie/hg_19_bowtie2 -1 " + read1[0] + " -2 " + read2[0] + \
+                              "Bowtie2/hg_19_bowtie2 -1 " + read1[0] + " -2 " + read2[0] + \
                               " | samtools view -@" + self.threads + " -bS - > " + gene_origin
                 else:
                     return "Please specify the map type Bwa/Bowtie "

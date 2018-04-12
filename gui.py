@@ -262,8 +262,12 @@ class PipelineGui:
         chdir(wd + "/" + mt)
         bam = gm + "/" + mt + "/" + gm_bam[0]
         interval = gm + "/" + mt + "/" + gm_interval[0]
-        pipeline2 = variant_calling.VariantCall(variant_caller=vc, thrds=th, map_type=mt, germline_bam=bam,
-                                    germline_realign=interval)
+        if vc == "Mutect2":
+            pipeline2 = variant_calling.VariantCall(variant_caller=vc, thrds=th, map_type=mt, germline_bam=bam,
+                                        germline_realign=interval, wd=wd)
+        else:
+            pipeline2 = variant_calling.VariantCall(variant_caller=vc, thrds=th, map_type=mt, germline_bam=bam,
+                                                    germline_realign=None, wd=wd)
         pipeline2_success = pipeline2.run_pipeline()
 
         return pipeline2_success
