@@ -5,10 +5,8 @@ from paths import GetPaths
 import shutil
 
 
-
-
 class BamPipeline(object):
-    # workingdirectory,  map_type, sample_type, library_matching_id, thrds
+
     def __init__(self, working_directory, map_type, sample_type, library_matching_id, thrds, gatk_tools):
         self.get_paths = GetPaths()
         self.working_directory = working_directory
@@ -25,11 +23,8 @@ class BamPipeline(object):
         os.chdir(self.working_directory)
 
     def get_fastq(self):
-
         all_fastq_files = glob.glob("*fastq.gz")
-
         split_names_v = [os.path.splitext(os.path.splitext(i)[0])[0] for i in all_fastq_files]
-
         return split_names_v
 
     def get_info(self, fastq_list):
@@ -120,13 +115,10 @@ class BamPipeline(object):
 
         all_bam_files = glob.glob("SortedBAM*")
         print(all_bam_files)
-        # sorted_bam_files = [os.path.splitext(os.path.splitext(i)[0])[0] for i in all_bam_files]
         inputs_list = ""
         for i in all_bam_files:
             inputs_list = inputs_list + "I=" + i + " "
-
         ouput_name = self.map_type + "_" + info_dict["Sample_ID"][0] + "_MergedBAM.bam"
-
         merge_command = "java -XX:ParallelGCThreads=" + self.threads + \
                         " -jar " + self.get_paths.picard_path + " MergeSamFiles " + inputs_list + \
                         " O=" + ouput_name + " USE_THREADING=true"
@@ -134,7 +126,6 @@ class BamPipeline(object):
         log_command(merge_command, "merge_bams", self.threads)
 
     def mark_duplicate(self):
-
         merged_bam = glob.glob("*_MergedBAM.bam")
         mark_prefix_removed = self.map_type + "_mdup_removed_"
         output = "OutputBAM_" + mark_prefix_removed + "_" + merged_bam[0]
@@ -155,39 +146,34 @@ class BamPipeline(object):
         log_command(bcal, "GATK_RealignTargetCreator", self.threads)
 
     def gatk_indel_realigner(self):
-
         bamstr = self.map_type + "_mdup_removed*.bam"
         lastbam = glob.glob(bamstr)
-
         realigned_last_bam = "IndelRealigned_" + lastbam[0]
-        bcal = "java -jar " + self.get_paths.gatk_path + " -T IndelRealigner -R " + self.bundle_dir + "/ucsc.hg19.fasta -known " + \
-               self.bundle_dir + "/Mills_and_1000G_gold_standard.indels.hg19.vcf" + \
+        bcal = "java -jar " + self.get_paths.gatk_path + " -T IndelRealigner -R " + self.bundle_dir + \
+               "/ucsc.hg19.fasta -known " + self.bundle_dir + "/Mills_and_1000G_gold_standard.indels.hg19.vcf" + \
                " -targetIntervals realign_target.intervals --noOriginalAlignmentTags -I " + lastbam[0] + " -o " + \
                realigned_last_bam
 
         log_command(bcal, "GATK_IndelRealigner", self.threads)
 
     def gatk_base_recalibrator(self):
-
         bamstr = "IndelRealigned_*.bam"
         lastbam = glob.glob(bamstr)
         basequalityscore = str(lastbam[0]).split(".")[0] + "_bqsr.grp"
         nct = " -nct " + str(self.threads)
-        bcal = "java -jar " + self.get_paths.gatk_path + nct + " -T BaseRecalibrator -R " + self.bundle_dir + "/ucsc.hg19.fasta -I " +\
-               lastbam[0] + " -knownSites " + self.bundle_dir + "/Mills_and_1000G_gold_standard.indels.hg19.vcf" + \
-               " -o " + basequalityscore
+        bcal = "java -jar " + self.get_paths.gatk_path + nct + " -T BaseRecalibrator -R " + self.bundle_dir +\
+               "/ucsc.hg19.fasta -I " + lastbam[0] + " -knownSites " + self.bundle_dir +\
+               "/Mills_and_1000G_gold_standard.indels.hg19.vcf" + " -o " + basequalityscore
         log_command(bcal, "GATK_BaseRecalibrator", self.threads)
 
     def gatk_print_reads(self):
-
         bamstr = "IndelRealigned_*.bam"
         lastbam = glob.glob(bamstr)
         bqsr = glob.glob("*.grp")[0]
         nct = " -nct " + str(self.threads)
         aftercalibratorBam = "OutputBAM_" + lastbam[0]
-        bcal = "java -jar " + self.get_paths.gatk_path + nct + " -T PrintReads -R " + self.bundle_dir + "/ucsc.hg19.fasta -I " + \
-               lastbam[0] + " --BQSR " + bqsr + " -o " + aftercalibratorBam
-
+        bcal = "java -jar " + self.get_paths.gatk_path + nct + " -T PrintReads -R " + self.bundle_dir + \
+               "/ucsc.hg19.fasta -I " + lastbam[0] + " --BQSR " + bqsr + " -o " + aftercalibratorBam
         log_command(bcal, "GATK_PrintReads", self.threads)
 
     def run_gatks(self):

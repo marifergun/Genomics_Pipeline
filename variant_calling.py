@@ -35,9 +35,10 @@ class VariantCall(object):
 
     def mutect_caller(self):
         nct = " -nct " + self.threads
-        command = "java -jar " + self.get_paths.gatk_path + " -T MuTect2 " + nct + " -R " + self.ref_dir + " -I:tumor " + \
-                  self.tumor_bam + " -I:normal " + self.germline_bam + " --dbsnp " + self.get_paths.dbsnp + " --cosmic " + \
-                  self.get_paths.cosmic + " -L " + self.tumor_realign + " -L " + self.germline_realign + " -o " + self.output_vcf
+        command = "java -jar " + self.get_paths.gatk_path + " -T MuTect2 " + nct + " -R " + self.ref_dir + \
+                  " -I:tumor " + self.tumor_bam + " -I:normal " + self.germline_bam + \
+                  " --dbsnp " + self.get_paths.dbsnp + " --cosmic " + self.get_paths.cosmic + \
+                  " -L " + self.tumor_realign + " -L " + self.germline_realign + " -o " + self.output_vcf
         print(command)
         log_command(command, "mutect_caller", self.threads)
 
@@ -54,9 +55,9 @@ class VariantCall(object):
         cwd = os.getcwd()
         cwd += "/output.basename"
         command = "java -jar " + self.get_paths.varscan_path + " somatic " + intermediate_mpileup + " " + cwd + \
-                  " --mpileup 1 --min-coverage 8 --min-coverage-normal 8 --min-coverage-tumor 6 --min-var-freq 0.10 " +\
-        "--min-freq-for-hom 0.75 --normal-purity 1.0 --tumor-purity 1.00 --p-value 0.99 --somatic-p-value 0.05 " + \
-                  "--strand-filter 0 --output-vcf"
+                  " --mpileup 1 --min-coverage 8 --min-coverage-normal 8 --min-coverage-tumor 6 --min-var-freq 0.10 " \
+                  "--min-freq-for-hom 0.75 --normal-purity 1.0 --tumor-purity 1.00 --p-value 0.99 " \
+                  "--somatic-p-value 0.05 " + "--strand-filter 0 --output-vcf"
 
         log_command(command, "varscan_caller_step2", self.threads)
         intermediate_varscan_somatic = glob.glob("output.basename*")
@@ -66,8 +67,8 @@ class VariantCall(object):
     def varscan_caller_step3(self, intermediate_varscan_somatic):
         print(intermediate_varscan_somatic)
         for somatic in intermediate_varscan_somatic:
-            command = "java -jar " + self.get_paths.varscan_path + " processSomatic " + somatic + " --min-tumor-freq 0.10 " + \
-                      "--max-normal-freq 0.05 --p-value 0.07"
+            command = "java -jar " + self.get_paths.varscan_path + " processSomatic " + somatic + \
+                      " --min-tumor-freq 0.10 --max-normal-freq 0.05 --p-value 0.07"
             log_command(command, "varscan_caller_step3", self.threads)
         return glob.glob("output.basename*")
 
