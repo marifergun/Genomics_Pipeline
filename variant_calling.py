@@ -63,7 +63,7 @@ class VariantCall(object):
         log_command(command, "varscan_caller_step2", self.threads)
         intermediate_varscan_somatic = glob.glob("output.basename*")
         print(command)
-        return intermediate_varscan_somatic[0]
+        return intermediate_varscan_somatic
 
     def varscan_caller_step3(self, intermediate_varscan_somatic):
         print(intermediate_varscan_somatic)
