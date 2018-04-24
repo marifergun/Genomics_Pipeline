@@ -137,7 +137,7 @@ class BamPipeline(object):
 
     def gatk_realign_target_creator(self):
 
-        bamstr = self.map_type + "_mdup_removed*.bam"
+        bamstr = "*" + self.map_type + "_mdup_removed*.bam"
         print(bamstr)
         lastbam = glob.glob(bamstr)
         bcal = "java -jar " + self.get_paths.gatk_path + " -T RealignerTargetCreator -nt " + \

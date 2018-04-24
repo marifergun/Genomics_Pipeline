@@ -257,6 +257,7 @@ class PipelineGui:
         th = self.threads.get()
 
         chdir(gm + "/" + mt)
+
         gm_bam = glob("OutputBAM_*.bam")
         gm_interval = glob("realign_target.intervals")
         chdir(wd + "/" + mt)
