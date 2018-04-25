@@ -147,7 +147,7 @@ class BamPipeline(object):
         log_command(bcal, "GATK_RealignTargetCreator", self.threads)
 
     def gatk_indel_realigner(self):
-        bamstr = self.map_type + "_mdup_removed*.bam"
+        bamstr = "*" + self.map_type + "_mdup_removed*.bam"
         lastbam = glob.glob(bamstr)
         realigned_last_bam = "IndelRealigned_" + lastbam[0]
         bcal = "java -jar " + self.get_paths.gatk_path + " -T IndelRealigner -R " + self.bundle_dir + \
@@ -158,7 +158,7 @@ class BamPipeline(object):
         log_command(bcal, "GATK_IndelRealigner", self.threads)
 
     def gatk_base_recalibrator(self):
-        bamstr = "IndelRealigned_*.bam"
+        bamstr = "*IndelRealigned_*.bam"
         lastbam = glob.glob(bamstr)
         basequalityscore = str(lastbam[0]).split(".")[0] + "_bqsr.grp"
         nct = " -nct " + str(self.threads)
@@ -168,7 +168,7 @@ class BamPipeline(object):
         log_command(bcal, "GATK_BaseRecalibrator", self.threads)
 
     def gatk_print_reads(self):
-        bamstr = "IndelRealigned_*.bam"
+        bamstr = "*IndelRealigned_*.bam"
         lastbam = glob.glob(bamstr)
         bqsr = glob.glob("*.grp")[0]
         nct = " -nct " + str(self.threads)
