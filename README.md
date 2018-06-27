@@ -14,7 +14,7 @@ The chart below shows the workflow of the pipeline.
 * <a href="https://broadinstitute.github.io/picard">Picard</a>
 * <a href="https://software.broadinstitute.org/gatk/documentation/quickstart">GenomeAnalysisToolkit (GATK 3.5-0)</a>
 * <a href="https://sourceforge.net/projects/varscan/files/">VarScan.v2.3.9</a>
-* <a href="www.htslib.org/download/">Samtools</a>
+* <a href="http://htslib.org/download">Samtools</a>
 
 ### Getting your clone
 ```
