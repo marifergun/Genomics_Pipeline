@@ -1,5 +1,8 @@
 # Genomics Pipeline
-Genomic Pipelines (Mapping + Variant Calling) from NGS Data
+
+Genomic Pipeline is a software used for analyzing DNA sequence data.
+
+The chart below shows the workflow of the pipeline. 
 
 ![workflow diagram 2 -page-3](https://user-images.githubusercontent.com/23744726/41977737-c54f42bc-7a28-11e8-86da-f8e62531bbd2.jpg)
 
@@ -11,6 +14,7 @@ Genomic Pipelines (Mapping + Variant Calling) from NGS Data
 * <a href="https://broadinstitute.github.io/picard">Picard</a>
 * <a href="https://software.broadinstitute.org/gatk/documentation/quickstart">GenomeAnalysisToolkit (GATK 3.5-0)</a>
 * <a href="https://sourceforge.net/projects/varscan/files/">VarScan.v2.3.9</a>
+* <a href="www.htslib.org/download/">Samtools</a>
 
 ### Getting your clone
 ```
