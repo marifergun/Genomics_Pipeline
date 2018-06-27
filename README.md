@@ -1,5 +1,8 @@
-# Genomics_Pipeline
+# Genomics Pipeline
 Genomic Pipelines (Mapping + Variant Calling) from NGS Data
+
+![workflow diagram 2 -page-3](https://user-images.githubusercontent.com/23744726/41977737-c54f42bc-7a28-11e8-86da-f8e62531bbd2.jpg)
+
 
 ## Getting Started
 ### Prerequisites
@@ -28,3 +31,5 @@ You can now
 Then you can start processing your data via submit button. The final VCF file will be saved in your working directory.
 
 ### Contact
+
+If you have questions or need help using the pipeline you can contact us via <a href="mailto:sahinsarihan@std.sehir.edu.tr?Subject=Genomics%20Pipeline" target="_top">e-mail</a>
